@@ -1,8 +1,4 @@
 import themidibus.*;
-import jmcvideo.*;
-
-class Building {
-}
 
 class Note {
   int channel;
@@ -97,17 +93,53 @@ Note[] toNoteArray(Collection l) {
   return notes;
 }
 
+class Building {
+  PImage[] frames;
+  int frame;
+  int finalFrame;
+  int x = 0;
+  int y = 0;
+  int w;
+  int h;
+  Building(String framesDir, float initialPosition, float finalPosition, float scale) {
+    File dir = new File(sketchPath + File.separator + "data" + File.separator + framesDir);
+    String[] files = dir.list();
+    Arrays.sort(files);
+    frames = new PImage[files.length];
+    PImage im = null;
+    for (int i = 0; i < files.length; i++) {
+      String file = files[i];
+      im = loadImage(framesDir + File.separator + file);
+      frames[i] = im;
+    }
+    w = int(im.width*scale);
+    h = int(im.height*scale);
+    frame = 4+int(initialPosition * (frames.length-5));
+    finalFrame = 4+int(finalPosition * (frames.length-5));
+  }
+  
+  void draw() {
+    PImage myMovie = frames[frame];
+    image(myMovie, x, y, w, h);
+    if (frame > finalFrame) {
+      frame--;
+    } else if (frame < finalFrame) {
+      frame++;
+    }
+  }
+}
+
 MidiBus myBus;
 
 int INPUT_DEVICE_INDEX = 0;
 int MIDI_NOTES = 128;
-//int OCTAVES = (int) Math.ceil((float)MIDI_NOTES/12);
-//Note[] currentNotes;
+int NOTES_PER_OCTAVE = 12;
+int OCTAVES = (int)Math.ceil(float(MIDI_NOTES)/NOTES_PER_OCTAVE);
 NoteManager noteManager;
-
-JMCMovie myMovie;
+Building building;
 
 void setup() {
+  println(OCTAVES);
   //screen
   size(400,400);
   frameRate(30);
@@ -125,11 +157,12 @@ void setup() {
     }
   }
   
-  myMovie = new JMCMovie(this, "seagram 3d_1.mov");
-  myMovie.bounce();
+  building = new Building("img/seagram", 0, 1, 0.4);
 }
 
+long frame = 0;
 void draw() {
+  frame++;
   background(0);
   //draw
   
@@ -156,21 +189,10 @@ void draw() {
     rect(x, y, w, h);
   }
   
-  myMovie.loadPixels();
-  color[] mask = new color[myMovie.pixels.length];
-  arraycopy(myMovie.pixels, mask);
-  for (int i = 0; i < mask.length; i++) {
-    color c = mask[i];
-    if (brightness(c) < 10) {
-      mask[i] = color(0);
-    }
-    else {
-      mask[i] = color(255);
-    }
-  }
-  myMovie.mask(mask);
-  myMovie.updatePixels();
-  image(myMovie, mouseX-myMovie.width/4, mouseY-myMovie.height/4, myMovie.width/2, myMovie.height/2);
+  building.draw();
+  
+  if (random(1) > 0.95)
+     building.finalFrame = 4+int(random(1) * (building.frames.length-5));
 }
 
 
