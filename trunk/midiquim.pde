@@ -93,6 +93,20 @@ Note[] toNoteArray(Collection l) {
   return notes;
 }
 
+PImage[] loadFrames(String framesDir) {
+  File dir = new File(sketchPath + File.separator + "data" + File.separator + framesDir);
+  String[] files = dir.list();
+  Arrays.sort(files);
+  PImage[] frames = new PImage[files.length];
+  PImage im = null;
+  for (int i = 0; i < files.length; i++) {
+    String file = files[i];
+    im = loadImage(framesDir + File.separator + file);
+    frames[i] = im;
+  }
+  return frames;
+}
+
 class Building {
   PImage[] frames;
   int frame;
@@ -101,21 +115,23 @@ class Building {
   int y = 0;
   int w;
   int h;
-  Building(String framesDir, float initialPosition, float finalPosition, float scale) {
-    File dir = new File(sketchPath + File.separator + "data" + File.separator + framesDir);
-    String[] files = dir.list();
-    Arrays.sort(files);
-    frames = new PImage[files.length];
-    PImage im = null;
-    for (int i = 0; i < files.length; i++) {
-      String file = files[i];
-      im = loadImage(framesDir + File.separator + file);
-      frames[i] = im;
-    }
-    w = int(im.width*scale);
-    h = int(im.height*scale);
-    frame = 4+int(initialPosition * (frames.length-5));
-    finalFrame = 4+int(finalPosition * (frames.length-5));
+  /*Building(String framesDir, float initialPC, float finalPC, float scale) {
+   this(loadFrames(framesDir), initialPC, finalPC, float scale); 
+  }*/
+  Building(PImage[] frames, float initialPC, float finalPC, float scale) {
+    this.frames = frames;
+    w = int(frames[0].width*scale);
+    h = int(frames[0].height*scale);
+    frame = pcToFrame(initialPC);
+    finalFrame = pcToFrame(finalPC);
+  }
+  
+  int pcToFrame(float pc) {
+    return int(pc * (frames.length-1));
+  }
+  
+  void setPC(float pc) {
+    finalFrame = pcToFrame(pc);
   }
   
   void draw() {
@@ -129,6 +145,59 @@ class Building {
   }
 }
 
+class City {
+  LinkedList rows = new LinkedList();
+  int maxRows;
+  PImage[] frames;
+  City(int maxRows, String imgName) {
+    this.maxRows = maxRows;
+    this.frames = loadFrames(imgName);
+  }
+  Building[] newDefaultRow() {
+    Building[] row = new Building[OCTAVES];
+    for (int i = 0; i < OCTAVES; i++) {
+      row[i] = new Building(frames, 0, 0, 0.3);
+    }
+    return newRow(row);
+  }
+  Building[] newRow(Building[] row) {
+    rows.offer(row);
+    while (rows.size()>maxRows) {
+      rows.poll();
+    }
+    return row;
+  }
+  void draw() {
+    for (int octave = OCTAVES - 1; octave >= 0; octave--) {
+      for (int rowN = rows.size()-1; rowN >= 0; rowN--) {
+        Building[] row = (Building[])rows.get(rows.size()-1-rowN);
+        Building building = row[octave];
+        if (building != null) {
+          building.x = 200 - 50*rowN;
+          building.y = 300 - 50*octave;
+          building.draw();
+        }
+      }
+    }
+  }
+  void noteOn(int channel, int pitch, int velocity) {
+    Building[] newRow = new Building[OCTAVES];//newDefaultRow();
+    newRow(newRow);
+    Note[] notes = noteManager.currentNotes();
+    for (int i = 0; i < notes.length; i++) {
+      int octave = notes[i].pitch / NOTES_PER_OCTAVE;
+      int n = notes[i].pitch % NOTES_PER_OCTAVE;
+      Building building = newRow[octave];
+      if (building == null) {
+        building = new Building(frames, 0, 0, 0.3);
+        newRow[octave] = building;
+      }
+      float f = float(n)/NOTES_PER_OCTAVE;
+      building.setPC(0.2 + 0.8*f);
+    }
+  }
+}
+
 MidiBus myBus;
 
 int INPUT_DEVICE_INDEX = 0;
@@ -136,13 +205,17 @@ int MIDI_NOTES = 128;
 int NOTES_PER_OCTAVE = 12;
 int OCTAVES = (int)Math.ceil(float(MIDI_NOTES)/NOTES_PER_OCTAVE);
 NoteManager noteManager;
-Building building;
+City city;
 
 void setup() {
   println(OCTAVES);
   //screen
   size(400,400);
   frameRate(30);
+  
+  //city
+  //building = new Building("img/seagram", 0, 1, 0.4);
+  city = new City(10, "img/seagram");
   
   //currentNotes = new Note[OCTAVES];
   noteManager = new NoteManager(50);
@@ -156,8 +229,6 @@ void setup() {
       myBus.addInput(i);
     }
   }
-  
-  building = new Building("img/seagram", 0, 1, 0.4);
 }
 
 long frame = 0;
@@ -165,6 +236,8 @@ void draw() {
   frame++;
   background(0);
   //draw
+  
+  city.draw();
   
   Note[] notes = noteManager.notes();
   for (int i = 0; i < notes.length; i++) {
@@ -188,16 +261,12 @@ void draw() {
       fill(color(0, 0, c));
     rect(x, y, w, h);
   }
-  
-  building.draw();
-  
-  if (random(1) > 0.95)
-     building.finalFrame = 4+int(random(1) * (building.frames.length-5));
 }
 
 
 void noteOn(int channel, int pitch, int velocity) {
   noteManager.noteOn(channel, pitch, velocity);
+  city.noteOn(channel, pitch, velocity);
 }
 
 void noteOff(int channel, int pitch, int velocity) {
