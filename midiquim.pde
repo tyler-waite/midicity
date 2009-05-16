@@ -95,7 +95,13 @@ Note[] toNoteArray(Collection l) {
 
 PImage[] loadFrames(String framesDir) {
   File dir = new File(sketchPath + File.separator + "data" + File.separator + framesDir);
-  String[] files = dir.list();
+  String[] files = dir.list(
+    new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        return name.endsWith(".png");
+      }
+    }
+  );
   Arrays.sort(files);
   PImage[] frames = new PImage[files.length];
   PImage im = null;
@@ -127,7 +133,7 @@ class Building {
   }
   
   int pcToFrame(float pc) {
-    return int(pc * (frames.length-1));
+    return int(pc * (frames.length+1));
   }
   
   void setPC(float pc) {
@@ -153,13 +159,6 @@ class City {
     this.maxRows = maxRows;
     this.frames = loadFrames(imgName);
   }
-  Building[] newDefaultRow() {
-    Building[] row = new Building[OCTAVES];
-    for (int i = 0; i < OCTAVES; i++) {
-      row[i] = new Building(frames, 0, 0, 0.3);
-    }
-    return newRow(row);
-  }
   Building[] newRow(Building[] row) {
     rows.offer(row);
     while (rows.size()>maxRows) {
@@ -173,8 +172,8 @@ class City {
         Building[] row = (Building[])rows.get(rows.size()-1-rowN);
         Building building = row[octave];
         if (building != null) {
-          building.x = 200 - 50*rowN;
-          building.y = 300 - 50*octave;
+          building.x = 400 - 100*rowN;
+          building.y = 500 - 100*octave;
           building.draw();
         }
       }
@@ -184,16 +183,21 @@ class City {
     Building[] newRow = new Building[OCTAVES];//newDefaultRow();
     newRow(newRow);
     Note[] notes = noteManager.currentNotes();
+    long time = millis();
     for (int i = 0; i < notes.length; i++) {
-      int octave = notes[i].pitch / NOTES_PER_OCTAVE;
-      int n = notes[i].pitch % NOTES_PER_OCTAVE;
-      Building building = newRow[octave];
-      if (building == null) {
-        building = new Building(frames, 0, 0, 0.3);
-        newRow[octave] = building;
+      Note note = notes[i];
+      float age = ((float)time - note.startMillis)/note.velocity;
+      if (age < 30) {
+        int octave = note.pitch / NOTES_PER_OCTAVE;
+        int n = note.pitch % NOTES_PER_OCTAVE;
+        Building building = newRow[octave];
+        if (building == null) {
+          building = new Building(frames, 0, 0, 0.6);
+          newRow[octave] = building;
+        }
+        float f = float(n)/NOTES_PER_OCTAVE;
+        building.setPC(0.2 + 0.8*f);
       }
-      float f = float(n)/NOTES_PER_OCTAVE;
-      building.setPC(0.2 + 0.8*f);
     }
   }
 }
@@ -210,12 +214,12 @@ City city;
 void setup() {
   println(OCTAVES);
   //screen
-  size(400,400);
+  size(800,600);
   frameRate(30);
   
   //city
   //building = new Building("img/seagram", 0, 1, 0.4);
-  city = new City(10, "img/seagram");
+  city = new City(8, "img/seagram");
   
   //currentNotes = new Note[OCTAVES];
   noteManager = new NoteManager(50);
@@ -259,7 +263,7 @@ void draw() {
       fill(color(0, c, 0));
     if (r==2)
       fill(color(0, 0, c));
-    rect(x, y, w, h);
+   // rect(x, y, w, h);
   }
 }
 
