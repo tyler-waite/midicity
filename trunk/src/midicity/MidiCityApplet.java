@@ -6,12 +6,10 @@ package midicity;
 import java.util.Arrays;
 
 import midicity.gui.City;
-import midicity.midi.Note;
 import midicity.midi.NoteManager;
 import processing.core.PApplet;
 import themidibus.MidiBus;
 import themidibus.MidiListener;
-import fullscreen.FullScreen;
 
 /**
  * @author mblech
@@ -20,7 +18,6 @@ import fullscreen.FullScreen;
 public class MidiCityApplet extends PApplet implements MidiListener {
 
 	MidiBus myBus;
-	FullScreen fs;
 
 	public NoteManager noteManager;
 	City city;
@@ -32,7 +29,7 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 		// city
 		// city = new City(8, "img/seagram");
-		city = new City(this, 15, "resources/img/02 animeup", true, PI / 6);
+		city = new City(this, 15, "img/02 animeup", true, PI / 6);
 
 		// currentNotes = new Note[OCTAVES];
 		noteManager = new NoteManager(50);
@@ -86,6 +83,8 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	}
 
 	public static void main(String[] args) {
-		PApplet.main(new String[] { "--present", MidiCityApplet.class.getName() });
+		PApplet
+				.main(new String[] { "--present",
+						MidiCityApplet.class.getName() });
 	}
 }
