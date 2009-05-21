@@ -16,6 +16,7 @@ public class NoteManager {
 	Queue<Note> notes;
 	int maxOld;
 
+	@SuppressWarnings("unchecked")
 	public NoteManager(int tempMO) {
 		noteQueues = new Queue[MIDI_NOTES];
 		for (int i = 0; i < noteQueues.length; i++) {
