@@ -83,8 +83,9 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	}
 
 	public static void main(String[] args) {
-		PApplet
-				.main(new String[] { "--present",
-						MidiCityApplet.class.getName() });
+		String[] newArgs = new String[args.length + 1];
+		System.arraycopy(args, 0, newArgs, 0, args.length);
+		newArgs[args.length] = MidiCityApplet.class.getName();
+		PApplet.main(newArgs);
 	}
 }
