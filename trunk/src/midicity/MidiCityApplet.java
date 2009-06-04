@@ -6,10 +6,12 @@ package midicity;
 import java.util.Arrays;
 
 import midicity.gui.City;
+import midicity.gui.PianoRoll;
 import midicity.midi.NoteManager;
 import processing.core.PApplet;
 import themidibus.MidiBus;
 import themidibus.MidiListener;
+import themidibus.RawMidiListener;
 
 /**
  * @author mblech
@@ -21,6 +23,7 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 	public NoteManager noteManager;
 	City city;
+	PianoRoll pianoRoll;
 
 	public void setup() {
 		// screen
@@ -28,10 +31,12 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		frameRate(30);
 
 		// city
-		// city = new City(8, "img/seagram");
-		city = new City(this, 15, "img/02 animeup", true, PI / 6);
+		city = new City(this, 15, "img/animeup-trimmed", true, PI / 6, 0.5f);
 
-		// currentNotes = new Note[OCTAVES];
+		// piano roll
+		pianoRoll = new PianoRoll(this);
+
+		// noteManager
 		noteManager = new NoteManager(50);
 
 		// midi
@@ -44,9 +49,6 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 				myBus.addInput(i);
 			}
 		}
-
-		// fullscreen
-		// fs = new FullScreen(this);
 	}
 
 	long frame = 0;
@@ -58,16 +60,8 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 		city.draw();
 
-		/*
-		 * Note[] notes = noteManager.notes(); for (int i = 0; i < notes.length;
-		 * i++) { Note note = notes[i]; int y = height - 4 * note.pitch; int w =
-		 * (int) note.duration() / 20; int x = width - w; int h = 6; int c = 2 *
-		 * note.velocity; if (!note.on) { long age = System.currentTimeMillis()
-		 * - note.endMillis; c = (int) max(2 * note.velocity - age / 50, 0); x
-		 * -= (int) age / 20; } int r = note.velocity % 3; if (r == 0)
-		 * fill(color(c, 0, 0)); if (r == 1) fill(color(0, c, 0)); if (r == 2)
-		 * fill(color(0, 0, c)); rect(x, y, w, h); }
-		 */
+		// pianoRoll.draw();
+
 	}
 
 	public void noteOn(int channel, int pitch, int velocity) {
@@ -80,6 +74,12 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	}
 
 	public void controllerChange(int channel, int number, int value) {
+		System.out.println("ctl(" + channel + ", " + number + ", " + value
+				+ ")");
+		if (number == 1) {
+			float angle = ((float) value) / 128 * (float) Math.PI;
+			city.setAngle(angle);
+		}
 	}
 
 	public static void main(String[] args) {

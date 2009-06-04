@@ -12,6 +12,7 @@ public class Building {
 	int w;
 	int h;
 	private MidiCityApplet parent;
+	private float scale;
 
 	/*
 	 * Building(String framesDir, float initialPC, float finalPC, float scale) {
@@ -20,10 +21,14 @@ public class Building {
 	Building(MidiCityApplet parent, PImage[] frames, float initialPC, float finalPC, float scale) {
 		this.parent = parent;
 		this.frames = frames;
-		w = (int) (frames[0].width * scale);
-		h = (int) (frames[0].height * scale);
+		w = h = 0;
+		for (PImage frame: frames) {
+			if (frame.width>w) w = frame.width;
+			if (frame.height>h) h = frame.height;
+		}
 		frame = pcToFrame(initialPC);
 		finalFrame = pcToFrame(finalPC);
+		this.scale = scale;
 	}
 
 	int pcToFrame(float pc) {
@@ -38,7 +43,7 @@ public class Building {
 
 	void draw() {
 		PImage image = frames[frame];
-		parent.image(image, x, y, w, h);
+		parent.image(image, x, y + scale*(h - image.height), scale * image.width, scale*image.height);
 		if (frame > finalFrame) {
 			frame--;
 		} else if (frame < finalFrame) {

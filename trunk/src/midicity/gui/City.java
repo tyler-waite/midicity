@@ -1,9 +1,5 @@
 package midicity.gui;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import midicity.MidiCityApplet;
@@ -20,13 +16,19 @@ public class City {
 	float sin;
 	float cos;
 	MidiCityApplet parent;
+	private float scale;
 
 	public City(MidiCityApplet parent, int maxRows, String imgName,
-			boolean reverse, float angle) {
+			boolean reverse, float angle, float scale) {
 		this.parent = parent;
 		this.maxRows = maxRows;
-		this.frames = loadFrames(imgName, reverse);
+		this.frames = ImageLoader.getFrames(imgName, reverse, parent);
 		this.angle = angle;
+		this.setAngle(angle);
+		this.scale = scale;
+	}
+
+	public void setAngle(float angle) {
 		this.sin = PApplet.sin(angle);
 		this.cos = PApplet.cos(angle);
 	}
@@ -45,9 +47,9 @@ public class City {
 				Building[] row = (Building[]) rows.get(rows.size() - 1 - rowN);
 				Building building = row[octave];
 				if (building != null) {
-					float x = parent.width - 600 - 78 * rowN;
+					float x = parent.width - 500 - 78 * rowN;
 					x += 40 * octave;
-					float y = 400 - 110 * octave;
+					float y = 800 - 200 * octave;
 					building.x = (int) (this.cos * x - this.sin * y);
 					building.y = (int) (this.sin * x + this.cos * y);
 					building.draw();
@@ -75,42 +77,10 @@ public class City {
 				Building building = newRow[octave];
 				if (building == null) {
 					building = new Building(parent, frames, initialPC, finalPC,
-							0.5f);
+							this.scale);
 					newRow[octave] = building;
 				}
 			}
 		}
-	}
-
-	PImage[] loadFrames(String framesDir, boolean invert) {
-		File dir = new File(framesDir);
-		String[] files = dir.list(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".png");
-			}
-		});
-		if (files == null)
-			throw new RuntimeException(new FileNotFoundException("no .pngs in "
-					+ dir.getAbsolutePath()));
-		Arrays.sort(files);
-		if (invert) {
-			int i = 0;
-			int j = files.length - 1;
-			while (i < j) {
-				String temp = files[i];
-				files[i] = files[j];
-				files[j] = temp;
-				i++;
-				j--;
-			}
-		}
-		PImage[] frames = new PImage[files.length];
-		PImage im = null;
-		for (int i = 0; i < files.length; i++) {
-			String file = files[i];
-			im = parent.loadImage(framesDir + File.separator + file);
-			frames[i] = im;
-		}
-		return frames;
 	}
 }
