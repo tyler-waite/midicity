@@ -8,15 +8,15 @@ public class Util {
 		if (l == null) {
 			return new Note[0];
 		}
-		Note[] notes = new Note[l.size()];
-		int i = 0;
 		synchronized (l) {
+			Note[] notes = new Note[l.size()];
+			int i = 0;
 			for (Note note : l) {
 				notes[i] = note;
 				i++;
 			}
+			return notes;
 		}
-		return notes;
 	}
 
 }

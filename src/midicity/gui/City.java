@@ -75,21 +75,21 @@ public class City implements NoteManager.NoteListener {
 	}
 
 	public void noteOn(Note note, NoteManager noteManager) {
-		Building newBuilding = createBuilding(note);
+		Building newBuilding = createBuilding(note, noteManager);
 		synchronized (buildings) {
 			buildings.put(note, newBuilding);
 		}
 	}
 
-	private Building createBuilding(Note note) {
-		PImage[] frames = selectFrames(note);
+	private Building createBuilding(Note note, NoteManager noteManager) {
+		PImage[] frames = selectFrames(note, noteManager);
 		int n = note.pitch % NoteManager.NOTES_PER_OCTAVE;
 		float finalPC = ((float) n) / NoteManager.NOTES_PER_OCTAVE;
 		Building building = new Building(parent, frames, 0, finalPC, this, note);
 		return building;
 	}
 
-	private PImage[] selectFrames(Note note) {
+	private PImage[] selectFrames(Note note, NoteManager noteManager) {
 		String[] names = frames.keySet().toArray(new String[frames.size()]);
 		String name = names[random.nextInt(names.length)];
 		return frames.get(name);

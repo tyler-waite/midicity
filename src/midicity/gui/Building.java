@@ -45,10 +45,12 @@ public class Building {
 
 	void draw() {
 		int octave = note.pitch / NoteManager.NOTES_PER_OCTAVE;
-		int y = parent.height - parent.yOffset - parent.octaveSeparation * octave;
+		int y = parent.height - parent.yOffset - parent.octaveSeparation
+				* octave;
 		int w = (int) (city.scale * note.duration(parent.velocityDurFactor) * parent.speedFactor);
 		int x = parent.width + parent.xOffset - w;
-		int lastX = parent.width + parent.xOffset - sideWidth;
+		int lastX = parent.width + parent.xOffset
+				- (int) (city.scale * sideWidth);
 
 		long age = note.getAge(parent.velocityDurFactor);
 		int ageDisplacement = (int) (city.scale * age * parent.speedFactor);
