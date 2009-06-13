@@ -11,7 +11,6 @@ import midicity.midi.NoteManager;
 import processing.core.PApplet;
 import themidibus.MidiBus;
 import themidibus.MidiListener;
-import themidibus.RawMidiListener;
 
 /**
  * @author mblech
@@ -24,20 +23,29 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	public NoteManager noteManager;
 	City city;
 	PianoRoll pianoRoll;
+	public float speedFactor;
+	public float velocityDurFactor;
 
 	public void setup() {
 		// screen
 		size(1024, 768);
 		frameRate(30);
 
+		// speed / tempo factor
+		speedFactor = 1.0f / 5;
+
+		// velocity duration factor
+		velocityDurFactor = 6000f / 128;
+
 		// city
-		city = new City(this, 15, "img/animeup-trimmed", true, PI / 6, 0.5f);
+		city = new City(this, 15, "img", false, PI / 6, 0.5f);
 
 		// piano roll
 		pianoRoll = new PianoRoll(this);
 
 		// noteManager
 		noteManager = new NoteManager(50);
+		noteManager.addListener(city);
 
 		// midi
 		myBus = new MidiBus(this);
@@ -66,7 +74,6 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 	public void noteOn(int channel, int pitch, int velocity) {
 		noteManager.noteOn(channel, pitch, velocity);
-		city.noteOn(channel, pitch, velocity);
 	}
 
 	public void noteOff(int channel, int pitch, int velocity) {

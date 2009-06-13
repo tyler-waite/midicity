@@ -1,6 +1,11 @@
 package midicity.gui;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
 
 import midicity.MidiCityApplet;
 import midicity.midi.Note;
@@ -8,21 +13,24 @@ import midicity.midi.NoteManager;
 import processing.core.PApplet;
 import processing.core.PImage;
 
-public class City {
+public class City implements NoteManager.NoteListener {
+	static Random random = new Random();
+
 	LinkedList<Building[]> rows = new LinkedList<Building[]>();
 	int maxRows;
-	PImage[] frames;
+	Map<String, PImage[]> frames;
 	float angle;
 	float sin;
 	float cos;
 	MidiCityApplet parent;
-	private float scale;
+	float scale;
+	Map<Note, Building> buildings = new HashMap<Note, Building>();
 
-	public City(MidiCityApplet parent, int maxRows, String imgName,
+	public City(MidiCityApplet parent, int maxRows, String framesDir,
 			boolean reverse, float angle, float scale) {
 		this.parent = parent;
 		this.maxRows = maxRows;
-		this.frames = ImageLoader.getFrames(imgName, reverse, parent);
+		this.frames = ImageLoader.getAllFrames(framesDir, reverse, parent);
 		this.angle = angle;
 		this.setAngle(angle);
 		this.scale = scale;
@@ -42,45 +50,54 @@ public class City {
 	}
 
 	public void draw() {
-		for (int octave = NoteManager.OCTAVES - 1; octave >= 0; octave--) {
-			for (int rowN = rows.size() - 1; rowN >= 0; rowN--) {
-				Building[] row = (Building[]) rows.get(rows.size() - 1 - rowN);
-				Building building = row[octave];
-				if (building != null) {
-					float x = parent.width - 500 - 78 * rowN;
-					x += 40 * octave;
-					float y = 800 - 200 * octave;
-					building.x = (int) (this.cos * x - this.sin * y);
-					building.y = (int) (this.sin * x + this.cos * y);
-					building.draw();
+		Building[] buildings = null;
+		synchronized (this.buildings) {
+			buildings = this.buildings.values().toArray(
+					new Building[this.buildings.size()]);
+		}
+		Arrays.sort(buildings, new Comparator<Building>() {
+			public int compare(Building o1, Building o2) {
+				int octave1 = o1.note.pitch / NoteManager.NOTES_PER_OCTAVE;
+				int octave2 = o2.note.pitch / NoteManager.NOTES_PER_OCTAVE;
+				int diff = octave2 - octave1;
+				if (diff == 0) {
+					diff = (int) (o1.note.startMillis - o2.note.startMillis);
 				}
+				return diff;
 			}
+		});
+		for (Building building : buildings) {
+			building.draw();
 		}
 	}
 
-	public void noteOn(int channel, int pitch, int velocity) {
-		Building[] newRow = new Building[NoteManager.OCTAVES];// newDefaultRow();
-		newRow(newRow);
-		Note[] notes = parent.noteManager.currentNotes();
-		long time = System.currentTimeMillis();
-		for (int i = 0; i < notes.length; i++) {
-			Note note = notes[i];
-			float age = ((float) (time - note.startMillis)) / note.velocity;
-			if (age < 35) {
-				int octave = note.pitch / NoteManager.NOTES_PER_OCTAVE;
-				int n = note.pitch % NoteManager.NOTES_PER_OCTAVE;
-				float finalPC = ((float) n) / NoteManager.NOTES_PER_OCTAVE;
-				float initialPC = finalPC;
-				if (pitch == note.pitch) {
-					initialPC = 0;
-				}
-				Building building = newRow[octave];
-				if (building == null) {
-					building = new Building(parent, frames, initialPC, finalPC,
-							this.scale);
-					newRow[octave] = building;
-				}
-			}
+	public void noteOff(Note note, NoteManager noteManager) {
+	}
+
+	public void noteOn(Note note, NoteManager noteManager) {
+		Building newBuilding = createBuilding(note);
+		synchronized (buildings) {
+			buildings.put(note, newBuilding);
+		}
+	}
+
+	private Building createBuilding(Note note) {
+		PImage[] frames = selectFrames(note);
+		int n = note.pitch % NoteManager.NOTES_PER_OCTAVE;
+		float finalPC = ((float) n) / NoteManager.NOTES_PER_OCTAVE;
+		Building building = new Building(parent, frames, 0, finalPC, this, note);
+		return building;
+	}
+
+	private PImage[] selectFrames(Note note) {
+		String[] names = frames.keySet().toArray(new String[frames.size()]);
+		String name = names[random.nextInt(names.length)];
+		return frames.get(name);
+	}
+
+	public void noteDied(Note note, NoteManager noteManager) {
+		synchronized (buildings) {
+			buildings.remove(note);
 		}
 	}
 }
