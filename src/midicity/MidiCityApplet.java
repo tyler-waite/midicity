@@ -25,6 +25,9 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	PianoRoll pianoRoll;
 	public float speedFactor;
 	public float velocityDurFactor;
+	public int xOffset;
+	public int yOffset;
+	public int octaveSeparation;
 
 	public void setup() {
 		// screen
@@ -36,6 +39,13 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 		// velocity duration factor
 		velocityDurFactor = 6000f / 128;
+
+		// screen offset
+		xOffset = -100;
+		yOffset = -400;
+
+		// inter-octave separation
+		octaveSeparation = 200;
 
 		// city
 		city = new City(this, 15, "img", false, PI / 6, 0.5f);
@@ -86,6 +96,28 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		if (number == 1) {
 			float angle = ((float) value) / 128 * (float) Math.PI;
 			city.setAngle(angle);
+			System.out.println("new angle: " + angle);
+		}
+		if (number == 74) {
+			xOffset = (int) (width * (2 * ((float) value) / 128 - 1));
+			System.out.println("new x-offset: " + xOffset);
+		}
+		if (number == 71) {
+			yOffset = (int) (height * (2 * ((float) value) / 128 - 1));
+			System.out.println("new y-offset: " + yOffset);
+		}
+		if (number == 91) {
+			octaveSeparation = (int) (height * (((float) value) / 128) / 2);
+			System.out.println("new inter-octave separation: "
+					+ octaveSeparation);
+		}
+		if (number == 93) {
+			city.scale = (2 * (((float) value) / 128));
+			System.out.println("new scale: " + city.scale);
+		}
+		if (number == 73) {
+			speedFactor = 0.01f + (2 * (((float) value) / 128));
+			System.out.println("new speed factor: " + speedFactor);
 		}
 	}
 

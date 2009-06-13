@@ -23,7 +23,7 @@ public class City implements NoteManager.NoteListener {
 	float sin;
 	float cos;
 	MidiCityApplet parent;
-	float scale;
+	public float scale;
 	Map<Note, Building> buildings = new HashMap<Note, Building>();
 
 	public City(MidiCityApplet parent, int maxRows, String framesDir,
