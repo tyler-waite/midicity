@@ -27,7 +27,7 @@ public class Building {
 			if (frame.height > frameHeight)
 				frameHeight = frame.height;
 		}
-		sideWidth = frameWidth / 3;
+		sideWidth = frameWidth / 2;
 		frame = pcToFrame(initialPC);
 		finalFrame = pcToFrame(finalPC);
 		this.city = city;
@@ -45,13 +45,13 @@ public class Building {
 
 	void draw() {
 		int octave = note.pitch / NoteManager.NOTES_PER_OCTAVE;
-		int y = parent.height - 200 * octave;
-		int w = (int) (note.duration(parent.velocityDurFactor) * parent.speedFactor);
-		int x = parent.width - 300 - w;
-		int lastX = parent.width - 300 - sideWidth;
+		int y = parent.height - parent.yOffset - parent.octaveSeparation * octave;
+		int w = (int) (city.scale * note.duration(parent.velocityDurFactor) * parent.speedFactor);
+		int x = parent.width + parent.xOffset - w;
+		int lastX = parent.width + parent.xOffset - sideWidth;
 
 		long age = note.getAge(parent.velocityDurFactor);
-		int ageDisplacement = (int) (age * parent.speedFactor);
+		int ageDisplacement = (int) (city.scale * age * parent.speedFactor);
 		x -= ageDisplacement;
 		lastX -= ageDisplacement;
 
@@ -59,7 +59,7 @@ public class Building {
 
 		while (x < lastX) {
 			drawImageAt(image, x, y);
-			x += sideWidth;
+			x += city.scale * sideWidth;
 		}
 		drawImageAt(image, lastX, y);
 
@@ -73,7 +73,7 @@ public class Building {
 	private void drawImageAt(PImage image, int x, int y) {
 		x = (int) (city.cos * x - city.sin * y);
 		y = (int) (city.sin * x + city.cos * y);
-		y += (int) (city.scale * (frameHeight - image.height));
+		y -= (int) (city.scale * image.height);
 		parent.image(image, x, y, city.scale * image.width, city.scale
 				* image.height);
 	}
