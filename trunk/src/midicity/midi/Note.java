@@ -26,10 +26,26 @@ public class Note {
 				+ startMillis + ", " + endMillis + ")";
 	}
 
-	public long duration() {
-		if (endMillis == -1)
-			return System.currentTimeMillis() - startMillis;
-		else
-			return endMillis - startMillis;
+	public long duration(float velocityDurFactor) {
+		long now = System.currentTimeMillis();
+		long endMillis = calculateEndMillis(velocityDurFactor, now);
+		return endMillis - startMillis;
+	}
+
+	public long getAge(float velocityDurFactor) {
+		long now = System.currentTimeMillis();
+		long endMillis = calculateEndMillis(velocityDurFactor, now);
+		return now - endMillis;
+	}
+
+	private long calculateEndMillis(float velocityDurFactor, long now) {
+		long endMillis = now;
+		if (!(this.endMillis == -1)) {
+			endMillis = this.endMillis;
+		}
+		long maxEndMillis = this.startMillis
+				+ (long) (velocityDurFactor * this.velocity);
+		endMillis = Math.min(endMillis, maxEndMillis);
+		return endMillis;
 	}
 }

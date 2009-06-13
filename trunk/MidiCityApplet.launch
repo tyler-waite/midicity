@@ -9,5 +9,6 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="midicity.MidiCityApplet"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--present"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="midicity"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024m"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:midicity}/../../resources"/>
 </launchConfiguration>

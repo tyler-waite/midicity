@@ -17,7 +17,7 @@ public class PianoRoll {
 		for (int i = 0; i < notes.length; i++) {
 			Note note = notes[i];
 			int y = parent.height - 4 * note.pitch;
-			int w = (int) note.duration() / 20;
+			int w = (int) note.duration(parent.velocityDurFactor) / 20;
 			int x = parent.width - w;
 			int h = 6;
 			int c = 2 * note.velocity;

@@ -23,7 +23,7 @@ public class ImageLoader {
 				return name.endsWith(".png");
 			}
 		});
-		if (files == null)
+		if (files == null || files.length == 0)
 			throw new RuntimeException(new FileNotFoundException("no .pngs in "
 					+ dir.getAbsolutePath()));
 		Arrays.sort(files);
@@ -55,6 +55,26 @@ public class ImageLoader {
 		if (!cache.containsKey(framesDir))
 			cache.put(framesDir, loadFrames(framesDir, invert, parent));
 		return cache.get(framesDir);
+	}
+
+	public static Map<String, PImage[]> getAllFrames(String dir,
+			boolean invert, PApplet parent) {
+		Map<String, PImage[]> allFrames = new HashMap<String, PImage[]>();
+		File dirFile = new File(dir);
+		String[] dirs = dirFile.list(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return new File(dir.getAbsolutePath() + File.separator + name)
+						.isDirectory();
+			}
+		});
+		for (String name : dirs) {
+			PImage[] frames = getFrames(dir + File.separator + name, invert,
+					parent);
+			if (frames.length > 0) {
+				allFrames.put(name, frames);
+			}
+		}
+		return allFrames;
 	}
 
 }
