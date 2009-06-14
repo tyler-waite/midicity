@@ -19,4 +19,14 @@ public class Util {
 		}
 	}
 
+	private static final float[] DISSONANCE = new float[] { 0.0f, 1.0f, 0.8f,
+			0.6f, 0.4f, 0.2f, 1.0f, 0.1f, 0.4f, 0.5f, 0.6f, 0.3f };
+
+	public static float getDissonance(int pitch1, int pitch2) {
+		int min = Math.min(pitch1, pitch2);
+		int max = Math.max(pitch1, pitch2);
+		int interval = (max - min) % NoteManager.NOTES_PER_OCTAVE;
+		return DISSONANCE[interval];
+	}
+
 }

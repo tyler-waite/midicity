@@ -1,8 +1,10 @@
 package midicity.gui;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
@@ -10,6 +12,7 @@ import java.util.Random;
 import midicity.MidiCityApplet;
 import midicity.midi.Note;
 import midicity.midi.NoteManager;
+import midicity.midi.Util;
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -90,9 +93,28 @@ public class City implements NoteManager.NoteListener {
 	}
 
 	private PImage[] selectFrames(Note note, NoteManager noteManager) {
-		String[] names = frames.keySet().toArray(new String[frames.size()]);
-		String name = names[random.nextInt(names.length)];
-		return frames.get(name);
+		Collection<PImage[]> available = new HashSet<PImage[]>(frames.values());
+		Note[] notes = noteManager.notes();
+		for (int i = notes.length - 1; i >= Math.max(0, notes.length - 4); i--) {
+			Note note2 = notes[i];
+			Building building = buildings.get(note2);
+			if (building != null) {
+				float dissonance = 0.2f + 0.8f * Util.getDissonance(
+						note.pitch, note2.pitch);
+				float rnd = random.nextFloat();
+				if (rnd > dissonance) {
+					return building.frames;
+				} else {
+					available.remove(building.frames);
+				}
+			}
+		}
+		if (available.size() == 0) {
+			available = frames.values();
+		}
+		PImage[][] allFrames = available
+				.toArray(new PImage[available.size()][]);
+		return allFrames[random.nextInt(allFrames.length)];
 	}
 
 	public void noteDied(Note note, NoteManager noteManager) {
