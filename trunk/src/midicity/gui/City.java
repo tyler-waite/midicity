@@ -95,20 +95,29 @@ public class City implements NoteManager.NoteListener {
 	private PImage[] selectFrames(Note note, NoteManager noteManager) {
 		Collection<PImage[]> available = new HashSet<PImage[]>(frames.values());
 		Note[] notes = noteManager.notes();
-		for (int i = notes.length - 1; i >= Math.max(0, notes.length - 4); i--) {
+		float minDissonance = Float.MAX_VALUE;
+		PImage[] minDisFrames = null;
+		for (int i = notes.length - 1; i >= 0; i--) {
+			if (minDissonance == 0.0f) {
+				break;
+			}
 			Note note2 = notes[i];
-			Building building = buildings.get(note2);
-			if (building != null) {
-				float dissonance = 0.2f + 0.8f * Util.getDissonance(
-						note.pitch, note2.pitch);
-				float rnd = random.nextFloat();
-				if (rnd > dissonance) {
-					return building.frames;
-				} else {
-					available.remove(building.frames);
+			float dissonance = Util.getDissonance(note.pitch, note2.pitch);
+			if (dissonance < minDissonance) {
+				Building building = buildings.get(note2);
+				if (building != null) {
+					minDissonance = dissonance;
+					minDisFrames = building.frames;
+					available.remove(minDisFrames);
 				}
 			}
 		}
+		if (minDisFrames != null) {
+			if (random.nextFloat() > 0.1f + 0.8f * minDissonance) {
+				return minDisFrames;
+			}
+		}
+
 		if (available.size() == 0) {
 			available = frames.values();
 		}
