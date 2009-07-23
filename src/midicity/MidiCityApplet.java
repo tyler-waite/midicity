@@ -6,6 +6,7 @@ package midicity;
 import java.util.Arrays;
 
 import midicity.gui.City;
+import midicity.gui.Overlay;
 import midicity.gui.PianoRoll;
 import midicity.midi.NoteManager;
 import processing.core.PApplet;
@@ -22,6 +23,7 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 	public NoteManager noteManager;
 	City city;
+	Overlay overlay;
 	PianoRoll pianoRoll;
 	public float speedFactor;
 	public float velocityDurFactor;
@@ -48,10 +50,12 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		octaveSeparation = 200;
 
 		// city
-		city = new City(this, 15, "img", false, PI / 6, 0.5f);
+		city = new City(this, "img/buildings", false, PI / 6, 0.5f);
+
+		overlay = new Overlay(this, "img/overlays/fog/fog_03", 0, 0, width, height);
 
 		// piano roll
-		pianoRoll = new PianoRoll(this);
+		// pianoRoll = new PianoRoll(this);
 
 		// noteManager
 		noteManager = new NoteManager(50);
@@ -77,6 +81,7 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		// draw
 
 		city.draw();
+		overlay.draw(this);
 
 		// pianoRoll.draw();
 
