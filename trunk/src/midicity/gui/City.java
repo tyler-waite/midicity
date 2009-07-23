@@ -20,7 +20,6 @@ public class City implements NoteManager.NoteListener {
 	static Random random = new Random();
 
 	LinkedList<Building[]> rows = new LinkedList<Building[]>();
-	int maxRows;
 	Map<String, PImage[]> frames;
 	float angle;
 	float sin;
@@ -29,10 +28,9 @@ public class City implements NoteManager.NoteListener {
 	public float scale;
 	Map<Note, Building> buildings = new HashMap<Note, Building>();
 
-	public City(MidiCityApplet parent, int maxRows, String framesDir,
-			boolean reverse, float angle, float scale) {
+	public City(MidiCityApplet parent, String framesDir, boolean reverse,
+			float angle, float scale) {
 		this.parent = parent;
-		this.maxRows = maxRows;
 		this.frames = ImageLoader.getAllFrames(framesDir, reverse, parent);
 		this.angle = angle;
 		this.setAngle(angle);
@@ -44,20 +42,14 @@ public class City implements NoteManager.NoteListener {
 		this.cos = PApplet.cos(angle);
 	}
 
-	Building[] newRow(Building[] row) {
-		rows.offer(row);
-		while (rows.size() > maxRows) {
-			rows.poll();
-		}
-		return row;
-	}
-
 	public void draw() {
 		Building[] buildings = null;
+		// get buildings array
 		synchronized (this.buildings) {
 			buildings = this.buildings.values().toArray(
 					new Building[this.buildings.size()]);
 		}
+		// sort to avoid overlap
 		Arrays.sort(buildings, new Comparator<Building>() {
 			public int compare(Building o1, Building o2) {
 				int octave1 = o1.note.pitch / NoteManager.NOTES_PER_OCTAVE;
@@ -69,6 +61,7 @@ public class City implements NoteManager.NoteListener {
 				return diff;
 			}
 		});
+		// draw each building
 		for (Building building : buildings) {
 			building.draw();
 		}
