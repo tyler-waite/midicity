@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/core.jar"/>
 	<classpathentry kind="lib" path="lib/themidibus.jar" sourcepath="lib/themidibus-src"/>
+	<classpathentry kind="lib" path="lib/SoundCipher.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

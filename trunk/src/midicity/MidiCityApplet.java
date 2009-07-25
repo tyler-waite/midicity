@@ -5,6 +5,10 @@ package midicity;
 
 import java.util.Arrays;
 
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+
 import midicity.gui.City;
 import midicity.gui.Overlay;
 import midicity.gui.PianoRoll;
@@ -23,7 +27,7 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 
 	public NoteManager noteManager;
 	City city;
-	Overlay overlay;
+	Overlay fog;
 	PianoRoll pianoRoll;
 	public float speedFactor;
 	public float velocityDurFactor;
@@ -31,34 +35,39 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	public int yOffset;
 	public int octaveSeparation;
 
+	private Overlay background;
+
 	public void setup() {
 		// screen
 		size(1024, 768);
 		frameRate(30);
 
 		// speed / tempo factor
-		speedFactor = 1.0f / 5;
+		speedFactor = 1.0f / 2;
 
 		// velocity duration factor
-		velocityDurFactor = 6000f / 128;
+		velocityDurFactor = 3000f / 128;
 
 		// screen offset
-		xOffset = -100;
-		yOffset = -400;
+		xOffset = 200;
+		yOffset = -300;
 
 		// inter-octave separation
-		octaveSeparation = 200;
+		octaveSeparation = 150;
 
 		// city
-		city = new City(this, "img/buildings", false, PI / 6, 0.5f);
+		city = new City(this, "img/buildings", false, PI / 5, 0.3f);
 
-		overlay = new Overlay(this, "img/overlays/fog/fog_03", 0, 0, width, height);
+		fog = new Overlay(this, "img/overlays/fog/fog_04_short", 0, 0, width,
+				height);
+		background = new Overlay(this, "img/overlays/background/atenas-chungo",
+				0, 0, width, height);
 
 		// piano roll
 		// pianoRoll = new PianoRoll(this);
 
 		// noteManager
-		noteManager = new NoteManager(50);
+		noteManager = new NoteManager(100);
 		noteManager.addListener(city);
 
 		// midi
@@ -66,11 +75,22 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		String[][] deviceList = MidiBus.returnList();
 		for (int i = 0; i < deviceList.length; i++) {
 			System.out.println(Arrays.toString(deviceList[i]));
+			try {
+				MidiDevice device = MidiSystem.getMidiDevice(MidiSystem
+						.getMidiDeviceInfo()[i]);
+				System.out.println(device);
+			} catch (MidiUnavailableException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			String type = deviceList[i][1];
 			if (type.contains("Input")) {
 				myBus.addInput(i);
 			}
 		}
+		// SoundCipher sc = new SoundCipher(this);
+		// sc.setMidiDeviceOutput(1);
+		// sc.playMidiFile("midi/deb_clai.mid");
 	}
 
 	long frame = 0;
@@ -79,9 +99,9 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		frame++;
 		background(0);
 		// draw
-
+		background.draw(this);
 		city.draw();
-		overlay.draw(this);
+		fog.draw(this);
 
 		// pianoRoll.draw();
 
@@ -98,32 +118,20 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	public void controllerChange(int channel, int number, int value) {
 		System.out.println("ctl(" + channel + ", " + number + ", " + value
 				+ ")");
-		if (number == 1) {
-			float angle = ((float) value) / 128 * (float) Math.PI;
-			city.setAngle(angle);
-			System.out.println("new angle: " + angle);
-		}
-		if (number == 74) {
-			xOffset = (int) (width * (2 * ((float) value) / 128 - 1));
-			System.out.println("new x-offset: " + xOffset);
-		}
-		if (number == 71) {
-			yOffset = (int) (height * (2 * ((float) value) / 128 - 1));
-			System.out.println("new y-offset: " + yOffset);
-		}
-		if (number == 91) {
-			octaveSeparation = (int) (height * (((float) value) / 128) / 2);
-			System.out.println("new inter-octave separation: "
-					+ octaveSeparation);
-		}
-		if (number == 93) {
-			city.scale = (2 * (((float) value) / 128));
-			System.out.println("new scale: " + city.scale);
-		}
-		if (number == 73) {
-			speedFactor = 0.01f + (2 * (((float) value) / 128));
-			System.out.println("new speed factor: " + speedFactor);
-		}
+		/*
+		 * if (number == 1) { float angle = ((float) value) / 128 * (float)
+		 * Math.PI; city.setAngle(angle); System.out.println("new angle: " +
+		 * angle); } if (number == 74) { xOffset = (int) (width * (2 * ((float)
+		 * value) / 128 - 1)); System.out.println("new x-offset: " + xOffset); }
+		 * if (number == 71) { yOffset = (int) (height * (2 * ((float) value) /
+		 * 128 - 1)); System.out.println("new y-offset: " + yOffset); } if
+		 * (number == 91) { octaveSeparation = (int) (height * (((float) value)
+		 * / 128) / 2); System.out.println("new inter-octave separation: " +
+		 * octaveSeparation); } if (number == 93) { city.scale = (2 * (((float)
+		 * value) / 128)); System.out.println("new scale: " + city.scale); } if
+		 * (number == 73) { speedFactor = 0.01f + (2 * (((float) value) / 128));
+		 * System.out.println("new speed factor: " + speedFactor); }
+		 */
 	}
 
 	public static void main(String[] args) {
