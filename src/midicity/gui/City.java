@@ -42,6 +42,18 @@ public class City implements NoteManager.NoteListener {
 		this.cos = PApplet.cos(angle);
 	}
 
+	private static Comparator<Building> BUILDING_COMPARATOR = new Comparator<Building>() {
+		public int compare(Building o1, Building o2) {
+			int octave1 = o1.note.pitch / NoteManager.NOTES_PER_OCTAVE;
+			int octave2 = o2.note.pitch / NoteManager.NOTES_PER_OCTAVE;
+			int diff = octave2 - octave1;
+			if (diff == 0) {
+				diff = (int) (o1.note.startMillis - o2.note.startMillis);
+			}
+			return diff;
+		}
+	};
+
 	public void draw() {
 		Building[] buildings = null;
 		// get buildings array
@@ -50,17 +62,7 @@ public class City implements NoteManager.NoteListener {
 					new Building[this.buildings.size()]);
 		}
 		// sort to avoid overlap
-		Arrays.sort(buildings, new Comparator<Building>() {
-			public int compare(Building o1, Building o2) {
-				int octave1 = o1.note.pitch / NoteManager.NOTES_PER_OCTAVE;
-				int octave2 = o2.note.pitch / NoteManager.NOTES_PER_OCTAVE;
-				int diff = octave2 - octave1;
-				if (diff == 0) {
-					diff = (int) (o1.note.startMillis - o2.note.startMillis);
-				}
-				return diff;
-			}
-		});
+		Arrays.sort(buildings, BUILDING_COMPARATOR);
 		// draw each building
 		for (Building building : buildings) {
 			building.draw();
