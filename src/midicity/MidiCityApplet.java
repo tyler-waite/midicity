@@ -56,7 +56,8 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		octaveSeparation = 100;
 
 		// city
-		city = new City(this, "img/buildings", "img/sidewalks", false, PI / 5, 0.3f);
+		city = new City(this, "img/buildings", "img/sidewalks", "img/floors",
+				false, PI / 5, 0.3f);
 
 		fog = new Overlay(this, "img/overlays/fog/fog_04_short", 0, 0, width,
 				height);
