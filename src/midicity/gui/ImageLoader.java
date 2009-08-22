@@ -61,6 +61,7 @@ public class ImageLoader {
 			boolean invert, PApplet parent) {
 		Map<String, PImage[]> allFrames = new HashMap<String, PImage[]>();
 		File dirFile = new File(dir);
+		System.out.println("Loading frames from: " + dirFile.getAbsolutePath());
 		String[] dirs = dirFile.list(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return new File(dir.getAbsolutePath() + File.separator + name)
