@@ -49,14 +49,14 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		velocityDurFactor = 3000f / 128;
 
 		// screen offset
-		xOffset = 200;
-		yOffset = -300;
+		xOffset = 0;
+		yOffset = -600;
 
 		// inter-octave separation
-		octaveSeparation = 150;
+		octaveSeparation = 100;
 
 		// city
-		city = new City(this, "img/buildings", false, PI / 5, 0.3f);
+		city = new City(this, "img/buildings", "img/sidewalks", false, PI / 5, 0.3f);
 
 		fog = new Overlay(this, "img/overlays/fog/fog_04_short", 0, 0, width,
 				height);

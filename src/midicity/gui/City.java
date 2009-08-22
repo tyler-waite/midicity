@@ -28,10 +28,14 @@ public class City implements NoteManager.NoteListener {
 	public float scale;
 	Map<Note, Building> buildings = new HashMap<Note, Building>();
 
-	public City(MidiCityApplet parent, String framesDir, boolean reverse,
-			float angle, float scale) {
+	Map<String, PImage[]> sidewalkFrames;
+
+	public City(MidiCityApplet parent, String framesDir,
+			String sidewalkFramesDir, boolean reverse, float angle, float scale) {
 		this.parent = parent;
 		this.frames = ImageLoader.getAllFrames(framesDir, reverse, parent);
+		this.sidewalkFrames = ImageLoader.getAllFrames(sidewalkFramesDir,
+				false, parent);
 		this.angle = angle;
 		this.setAngle(angle);
 		this.scale = scale;
@@ -81,9 +85,21 @@ public class City implements NoteManager.NoteListener {
 
 	private Building createBuilding(Note note, NoteManager noteManager) {
 		PImage[] frames = selectFrames(note, noteManager);
-		int n = note.pitch % NoteManager.NOTES_PER_OCTAVE;
-		float finalPC = ((float) n) / NoteManager.NOTES_PER_OCTAVE;
-		Building building = new Building(parent, frames, 0, finalPC, this, note);
+		// note = height
+		// int n = note.pitch % NoteManager.NOTES_PER_OCTAVE;
+		// float finalPC = ((float) n) / NoteManager.NOTES_PER_OCTAVE;
+
+		// velocity = height
+		float finalPC = ((float) note.velocity) / 80;
+		if (finalPC < 0)
+			finalPC = 0;
+		if (finalPC > 1)
+			finalPC = 1;
+
+		PImage[] sf = (PImage[]) this.sidewalkFrames.values().toArray()[random
+				.nextInt(this.sidewalkFrames.size())];
+		Building building = new Building(parent, frames, sf, 0, finalPC, this,
+				note);
 		return building;
 	}
 
