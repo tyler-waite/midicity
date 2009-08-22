@@ -30,8 +30,11 @@ public class City implements NoteManager.NoteListener {
 
 	Map<String, PImage[]> sidewalkFrames;
 
+	private Floor floor;
+
 	public City(MidiCityApplet parent, String framesDir,
-			String sidewalkFramesDir, boolean reverse, float angle, float scale) {
+			String sidewalkFramesDir, String floorImagesDir, boolean reverse,
+			float angle, float scale) {
 		this.parent = parent;
 		this.frames = ImageLoader.getAllFrames(framesDir, reverse, parent);
 		this.sidewalkFrames = ImageLoader.getAllFrames(sidewalkFramesDir,
@@ -39,6 +42,9 @@ public class City implements NoteManager.NoteListener {
 		this.angle = angle;
 		this.setAngle(angle);
 		this.scale = scale;
+		PImage[] floorImages = ImageLoader.getFrames(floorImagesDir, false,
+				parent);
+		this.floor = new Floor(parent, this, floorImages, 200, 100);
 	}
 
 	public void setAngle(float angle) {
@@ -59,6 +65,7 @@ public class City implements NoteManager.NoteListener {
 	};
 
 	public void draw() {
+		floor.draw();
 		Building[] buildings = null;
 		// get buildings array
 		synchronized (this.buildings) {
