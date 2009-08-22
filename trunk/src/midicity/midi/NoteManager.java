@@ -20,7 +20,7 @@ public class NoteManager {
 	}
 
 	public static int MIDI_NOTES = 128;
-	public static int NOTES_PER_OCTAVE = 12;
+	public static int NOTES_PER_OCTAVE = 6;
 	public static int OCTAVES = (int) Math.ceil(((float) MIDI_NOTES)
 			/ NOTES_PER_OCTAVE);
 
