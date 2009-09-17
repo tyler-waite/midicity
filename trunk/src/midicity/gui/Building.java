@@ -101,10 +101,10 @@ public class Building {
 		lastX -= ageDisplacement;
 
 		while (x < lastX) {
-			drawImageAt(sidewalk, x, y, 0.2f);
-			x += 0.2f * city.scale * swSideWidth;
+			drawImageAt(sidewalk, x, y, 1f);
+			x += city.scale * swSideWidth;
 		}
-		drawImageAt(sidewalk, lastX, y, 0.2f);
+		drawImageAt(sidewalk, lastX, y, 1f);
 		if (sidewalkFrame < sidewalkFrames.length - 1)
 			sidewalkFrame++;
 	}

@@ -44,7 +44,7 @@ public class City implements NoteManager.NoteListener {
 		this.scale = scale;
 		PImage[] floorImages = ImageLoader.getFrames(floorImagesDir, false,
 				parent);
-		this.floor = new Floor(parent, this, floorImages, 200, 100);
+		this.floor = new Floor(parent, this, floorImages, 140, 85);
 	}
 
 	public void setAngle(float angle) {

@@ -26,11 +26,9 @@ public class Floor {
 	public void draw() {
 		int time = (int) (System.currentTimeMillis() - firstTime);
 		time *= city.scale * parent.speedFactor;
-		displacement = (int) (time % width);
-		for (int y = -parent.height; y <= 2 * parent.height; y += height
-				* city.scale) {
-			for (int x = -10 - displacement; x < 2 * parent.width; x += width
-					* city.scale) {
+		displacement = (int) (time % (width));
+		for (int y = -parent.height; y <= 2 * parent.height; y += height) {
+			for (int x = -10 - displacement; x < 2 * parent.width; x += width) {
 				PImage image = images[City.random.nextInt(images.length)];
 				drawImageAt(image, x, y);
 			}
@@ -44,9 +42,8 @@ public class Floor {
 	private void drawImageAt(PImage image, int x, int y, float scale) {
 		x = (int) (city.cos * x - city.sin * y);
 		y = (int) (city.sin * x + city.cos * y);
-		y -= (int) (scale * city.scale * image.height);
-		parent.image(image, x, y, scale * city.scale * image.width, scale
-				* city.scale * image.height);
+		y -= (int) (scale * image.height);
+		parent.image(image, x, y, scale * image.width, scale * image.height);
 	}
 
 }
