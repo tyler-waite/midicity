@@ -35,34 +35,30 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 	public int yOffset;
 	public int octaveSeparation;
 
-	private Overlay background;
-
 	public void setup() {
 		// screen
 		size(1024, 768);
 		frameRate(30);
 
 		// speed / tempo factor
-		speedFactor = 1.0f / 2;
+		speedFactor = 1.0f / 3;
 
 		// velocity duration factor
 		velocityDurFactor = 3000f / 128;
 
 		// screen offset
 		xOffset = 0;
-		yOffset = -600;
+		yOffset = -550;
 
 		// inter-octave separation
-		octaveSeparation = 100;
+		octaveSeparation = 110;
 
 		// city
 		city = new City(this, "img/buildings", "img/sidewalks", "img/floors",
-				false, PI / 5, 0.3f);
+				false, PI / 5, 0.6f);
 
 		fog = new Overlay(this, "img/overlays/fog/fog_04_short", 0, 0, width,
 				height);
-		background = new Overlay(this, "img/overlays/background/atenas-chungo",
-				0, 0, width, height);
 
 		// piano roll
 		// pianoRoll = new PianoRoll(this);
@@ -100,7 +96,6 @@ public class MidiCityApplet extends PApplet implements MidiListener {
 		frame++;
 		background(0);
 		// draw
-		background.draw(this);
 		city.draw();
 		fog.draw(this);
 
