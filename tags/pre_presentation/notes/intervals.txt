@@ -1,0 +1,9 @@
+interval             p(different building)
+==================== ======================
+aug. 4th             1.0
+min. 2nd / maj. 7th  1.0
+maj. 2nd / min. 7th  0.8
+min. 3rd / maj. 6th  0.6
+maj. 3rd / min. 6th  0.4
+perf.4th / perf.5th  0.2
+same     / oct.      0.0
