@@ -21,6 +21,7 @@ import themidibus.MidiListener;
  * @author mblech
  * 
  */
+@SuppressWarnings("serial")
 public class MidiCityApplet extends PApplet implements MidiListener {
 
 	MidiBus myBus;
